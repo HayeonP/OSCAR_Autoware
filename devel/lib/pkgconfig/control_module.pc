@@ -1,0 +1,8 @@
+prefix=/home/nvidia/oscar_ws/devel
+
+Name: control_module
+Description: Description of control_module
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/nvidia/oscar_ws/devel/lib 
+Requires: roscpp tf geometry_msgs std_msgs
