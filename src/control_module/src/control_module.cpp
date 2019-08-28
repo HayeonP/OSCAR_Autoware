@@ -10,26 +10,31 @@ void ControlModule::twist_cb
 
 void ControlModule::get_vesc_value()
 {
-	double twist_vel = twist_.linear.x;
-	double twist_pos = twist_.angular.z;
+	speed_ = twist_.linear.x * speed_to_erpm_gain + speed_to_erpm_offset; //twist -> vesc(rpm)
+	current_steering_angle = arctan(wheelbase* twist_.angular.z / twist_.linear.x);
+	position_ = current_steering_angle * steering_angle_to_servo_gain + steering_angle_to_servo_offset;
+		
 
 }
 
 void ControlModule::get_vesc_value_k()
 {
+	double twist_vel = twist_.linear.x;
+	double twist_pos = twist_.angular.z;
+
 	speed_ = twist_.linear.x * 500;
 	double angle = -1 * radian_to_degree(twist_.angular.z);
 	position_ = valMap(angle, -25.0, 25.0, 0.0, 1.0);
-	if(position_ > 0.8) position_ = 0.8;
-	else if(position_ < 0.2) position_ = 0.2;
+	if (position_ > 0.8) position_ = 0.8;
+	else if (position_ < 0.2) position_ = 0.2;
 }
 
 void ControlModule::send_vesc_value()
 {
 	//if(isKeyboard_)
-		get_vesc_value_k();
+	//get_vesc_value_k();
 	//else
-	//	get_vesc_value();
+	get_vesc_value();
 
 	std_msgs::Float64 velocity;
 	std_msgs::Float64 position;
@@ -50,14 +55,14 @@ double ControlModule::valMap
 double ControlModule::radian_to_degree
 (double radian)
 {
-	return radian * 180/PI;
+	return radian * 180 / PI;
 }
 
 
 void ControlModule::Run()
 {
 	nh_.param<bool>("keybaord", isKeyboard_, true);
-	ROS_WARN("Keyboard : %s", isKeyboard_? "true" : "false");
+	ROS_WARN("Keyboard : %s", isKeyboard_ ? "true" : "false");
 	twist_sub_ = nh_.subscribe("/twist_cmd", 10, &ControlModule::twist_cb, this);
 	vel_pub_ = nh_.advertise<std_msgs::Float64>("/commands/motor/speed", 10);
 	pos_pub_ = nh_.advertise<std_msgs::Float64>("/commands/servo/position", 10);
