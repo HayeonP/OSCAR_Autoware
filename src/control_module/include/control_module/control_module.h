@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <std_msgs/Float64.h>
+#include <math.h>
 
 #define PI 3.14
 
@@ -10,6 +11,11 @@ private:
 	ros::Subscriber twist_sub_;
 	ros::Publisher vel_pub_;
 	ros::Publisher pos_pub_;
+	double speed_to_erpm_gain_;
+	double speed_to_erpm_offset_;
+	double steering_angle_to_servo_gain_;
+	double steering_angle_to_servo_offset_;
+	double wheelbase_;
 	
 	bool isKeyboard_;
 	double speed_;
